@@ -3,7 +3,7 @@ const rateLimit = require('express-rate-limit');
 const { db } = require('../config/database');
 const { sendOTP, generateOTP } = require('../services/zenvia.service');
 const { authorizeUser, getRouter } = require('../services/mikrotik.service');
-const { autenticarCliente } = require('../services/ixc.service');
+const { identificarClientePorCpf } = require('../services/ixc.service');
 
 const router = express.Router();
 
@@ -62,17 +62,17 @@ router.get('/settings', (req, res) => {
   res.json(settings);
 });
 
-// POST /api/hotspot/cpf-login — cliente Inforcenter entra com CPF + senha do hotsite (IXC)
+// POST /api/hotspot/cpf-login — cliente Inforcenter entra só com o CPF (identificado no IXC)
 router.post('/cpf-login', cpfLoginLimiter, async (req, res) => {
-  const { cpf, senha, mac, ip, router: routerId } = req.body;
-  if (!cpf || !senha) return res.status(400).json({ error: 'CPF e senha são obrigatórios.' });
+  const { cpf, mac, ip, router: routerId } = req.body;
+  if (!cpf) return res.status(400).json({ error: 'CPF é obrigatório.' });
 
   const digits = cpf.replace(/\D/g, '');
   if (!isValidCpf(digits)) return res.status(400).json({ error: 'CPF inválido.' });
 
   let cliente;
   try {
-    cliente = await autenticarCliente(digits, senha);
+    cliente = await identificarClientePorCpf(digits);
   } catch (err) {
     return res.status(401).json({ error: err.message });
   }

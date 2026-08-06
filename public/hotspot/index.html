@@ -37,16 +37,12 @@
             <button type="button" class="mode-tab" id="tab-visitor" onclick="switchMode('visitor')">Ainda não sou cliente</button>
           </div>
 
-          <!-- Fluxo CLIENTE: CPF + senha do app/hotsite -->
+          <!-- Fluxo CLIENTE: só o CPF, identificado direto no sistema da Inforcenter -->
           <form id="form-client" onsubmit="return false;">
             <div class="form-group">
               <label class="form-label">CPF</label>
               <input type="text" id="input-cpf" class="form-control" placeholder="000.000.000-00" inputmode="numeric" maxlength="14" autocomplete="username">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Senha</label>
-              <input type="password" id="input-senha" class="form-control" placeholder="A mesma senha do app Inforcenter" autocomplete="current-password">
-              <span style="display:block;font-size:12px;color:var(--text-muted);margin-top:6px;">No primeiro acesso, use os 5 primeiros dígitos do seu CPF.</span>
+              <span style="display:block;font-size:12px;color:var(--text-muted);margin-top:6px;">Confirmamos seu cadastro direto no sistema da Inforcenter — não precisa de senha.</span>
             </div>
             <button type="submit" class="btn btn-primary" id="btn-cpf-login" onclick="cpfLogin()">
               Entrar e conectar
@@ -157,7 +153,7 @@
       </div>
       <div class="modal-body">
         <p><strong>1. O serviço.</strong> O Wi-Fi gratuito é oferecido pela <strong>Inforcenter</strong> como cortesia, sem garantia de velocidade, estabilidade ou disponibilidade contínua. O acesso é liberado por tempo limitado e pode ser encerrado ou alterado a qualquer momento.</p>
-        <p><strong>2. Clientes Inforcenter.</strong> Se você já é cliente, o acesso é liberado com o mesmo login (CPF e senha) do app Inforcenter — não coletamos uma senha nova, apenas confirmamos sua identidade junto ao nosso sistema.</p>
+        <p><strong>2. Clientes Inforcenter.</strong> Se você já é cliente, o acesso é liberado só com o seu CPF — nós confirmamos seu cadastro direto no nosso sistema, sem pedir senha.</p>
         <p><strong>3. Visitantes.</strong> Para quem ainda não é cliente, coletamos: nome, número de celular, e-mail (quando informado), endereço MAC do aparelho, endereço IP e horários de conexão.</p>
         <p><strong>4. Finalidade (LGPD).</strong> Esses dados são usados para: (a) identificar o usuário e liberar o acesso à rede; (b) segurança e registro das conexões, conforme o Marco Civil da Internet (Lei 12.965/2014); e (c) <strong>contato comercial da Inforcenter</strong>, por WhatsApp ou telefone, com ofertas de planos de internet. Ao se conectar, você autoriza esse contato.</p>
         <p><strong>5. Compartilhamento.</strong> Seus dados não são vendidos nem compartilhados com terceiros, exceto por obrigação legal ou ordem judicial.</p>

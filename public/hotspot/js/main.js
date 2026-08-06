@@ -116,18 +116,13 @@ function formatPhone(value) {
   return `(${digits.slice(0,2)}) ${digits.slice(2,7)}-${digits.slice(7)}`;
 }
 
-// ===== Fluxo CLIENTE: CPF + senha do hotsite/app (validado contra o IXC) =====
+// ===== Fluxo CLIENTE: identificação só pelo CPF (validado contra o IXC) =====
 async function cpfLogin() {
   const cpf = document.getElementById('input-cpf').value;
-  const senha = document.getElementById('input-senha').value;
   const digits = cpf.replace(/\D/g, '');
 
   if (!isValidCpf(digits)) {
     showAlert('error', 'Digite um CPF válido.');
-    return;
-  }
-  if (!senha) {
-    showAlert('error', 'Digite sua senha.');
     return;
   }
 
@@ -153,7 +148,6 @@ async function cpfLogin() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         cpf: digits,
-        senha,
         mac: urlParams.mac,
         ip: urlParams.ip,
         router: urlParams.router

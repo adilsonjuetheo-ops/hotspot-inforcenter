@@ -13,7 +13,7 @@
 #   O roteador Wi-Fi deve ser ligado pela porta LAN (NÃO usar a porta WAN),
 #   com o DHCP dele DESATIVADO — quem entrega IP e controla tudo é o MikroTik.
 #
-# LOGIN POR CPF: a validação do CPF/senha do cliente acontece no BACKEND
+# LOGIN POR CPF: a identificação do CPF do cliente acontece no BACKEND
 # (que consulta a API do IXC) — o MikroTik só recebe o comando final de
 # liberar o acesso, igual ao fluxo de visitante. Nenhum ajuste extra de
 # walled garden é necessário para isso.

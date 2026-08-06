@@ -1,5 +1,4 @@
 const axios = require('axios');
-const crypto = require('crypto');
 
 // Cliente da API REST do IXC Soft. Autenticação Basic Auth com "id_token:hash_token".
 // Listagens: POST no recurso com header ixcsoft: listar.
@@ -36,10 +35,6 @@ function formatarCpf(cpf) {
     : digits;
 }
 
-function md5(value) {
-  return crypto.createHash('md5').update(value, 'utf8').digest('hex');
-}
-
 async function buscarClientePorCpf(cpf) {
   const registros = await ixcList('/cliente', {
     qtype: 'cliente.cnpj_cpf',
@@ -49,40 +44,14 @@ async function buscarClientePorCpf(cpf) {
   return registros[0] || null;
 }
 
-async function buscarClientePorCpfESenha(cpf, senha) {
-  const registros = await ixcList('/cliente', {
-    qtype: 'cliente.cnpj_cpf',
-    query: formatarCpf(cpf),
-    oper: '=',
-    grid_param: JSON.stringify([{ TB: 'cliente.senha', OP: '=', P: senha }])
-  });
-  return registros[0] || null;
-}
-
-// Mesma regra do app do assinante: senha em texto puro, depois MD5, depois
-// senha padrão do primeiro acesso (5 primeiros dígitos do CPF) para quem
-// nunca cadastrou senha no hotsite.
-async function autenticarCliente(cpf, senha) {
+// Identifica o cliente só pelo CPF — sem senha. O hotspot é liberado a
+// qualquer assinante cadastrado no IXC, sem exigir a senha do app/hotsite.
+async function identificarClientePorCpf(cpf) {
   const digits = cpf.replace(/\D/g, '');
   if (digits.length !== 11) throw new Error('CPF inválido. Confira os 11 dígitos.');
-  if (!senha) throw new Error('Informe sua senha.');
 
-  const existe = await buscarClientePorCpf(digits);
-  if (!existe) throw new Error('CPF não encontrado. Verifique os dados ou fale com o suporte da Inforcenter.');
-
-  let cliente = await buscarClientePorCpfESenha(digits, senha);
-  if (!cliente) cliente = await buscarClientePorCpfESenha(digits, md5(senha));
-
-  if (!cliente) {
-    const senhaPadrao = digits.slice(0, 5);
-    if (senha === senhaPadrao) {
-      cliente = await buscarClientePorCpfESenha(digits, '');
-    }
-  }
-
-  if (!cliente) {
-    throw new Error('Senha incorreta. No primeiro acesso, use os 5 primeiros dígitos do seu CPF (a mesma senha do app Inforcenter).');
-  }
+  const cliente = await buscarClientePorCpf(digits);
+  if (!cliente) throw new Error('CPF não encontrado. Verifique os dados ou fale com o suporte da Inforcenter.');
 
   return {
     id: cliente.id,
@@ -92,4 +61,4 @@ async function autenticarCliente(cpf, senha) {
   };
 }
 
-module.exports = { autenticarCliente, buscarClientePorCpf };
+module.exports = { identificarClientePorCpf, buscarClientePorCpf };

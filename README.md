@@ -5,7 +5,7 @@ Sistema de Wi-Fi Hotspot da Inforcenter com dois fluxos de acesso, integração 
 ## Funcionalidades
 
 - **Portal Hotspot** — página de login com identidade visual Inforcenter (dark + verde)
-- **Login por CPF (clientes)** — quem já é assinante entra com o mesmo CPF/senha do app Inforcenter; a validação é feita direto contra a API do IXC Soft, sem cadastrar senha nova
+- **Login por CPF (clientes)** — quem já é assinante entra só com o CPF; a identificação é feita direto contra a API do IXC Soft, sem exigir senha
 - **Captação de leads (visitantes)** — quem ainda não é cliente libera o acesso com nome + telefone (mesmo fluxo comercial do sistema da MG-NET SAL), servindo como porta de entrada para vendas
 - **Integração MikroTik** — liberação automática de acesso via API RouterOS, com tempos de sessão diferentes para cliente x visitante
 - **Painel Admin** — dashboard (com contagem de clientes x visitantes), gerenciamento de conexões, sessões ativas e configurações
@@ -56,7 +56,7 @@ Preencha (veja `backend/.env.example` para a lista completa):
 | `PORT` | Porta do servidor (padrão: 3000) |
 | `JWT_SECRET` | Chave secreta JWT (string aleatória longa) |
 | `ADMIN_USERNAME` / `ADMIN_PASSWORD` | Login inicial do painel admin |
-| `IXC_BASE_URL` / `IXC_TOKEN` | Mesmos dados usados no app do assinante — valida CPF/senha dos clientes |
+| `IXC_BASE_URL` / `IXC_TOKEN` | Mesmos dados usados no app do assinante — identifica o CPF dos clientes |
 | `OTP_ENABLED` | `1` exige código SMS para visitantes; `0` (padrão) libera direto com nome + telefone |
 | `MIKROTIK_HOST` / `MIKROTIK_PORT` / `MIKROTIK_USER` / `MIKROTIK_PASSWORD` | Acesso à API do MikroTik |
 | `HOTSPOT_FREE_TIME` | Minutos de acesso para visitantes (padrão 60) |
@@ -101,7 +101,7 @@ Veja o arquivo `mikrotik/configurar-hotspot.rsc` para o passo a passo completo.
 5. Adicione o domínio do portal ao **Walled Garden** (HTTP e IP/HTTPS)
 6. O roteador Wi-Fi fica em modo AP burro: cabo na porta **LAN**, DHCP desativado — o MikroTik gerencia tudo
 
-A validação de CPF/senha acontece inteiramente no backend (que consulta a API do IXC) — o MikroTik só recebe o comando final de liberar o acesso, então nenhuma configuração extra de walled garden é necessária para o login de clientes.
+A identificação por CPF acontece inteiramente no backend (que consulta a API do IXC) — o MikroTik só recebe o comando final de liberar o acesso, então nenhuma configuração extra de walled garden é necessária para o login de clientes.
 
 ---
 
@@ -123,7 +123,7 @@ Pessoa conecta ao Wi-Fi
         ↓
 MikroTik redireciona para o portal
         ↓
-        ├── É cliente Inforcenter? → CPF + senha (validado no IXC) → acesso liberado
+        ├── É cliente Inforcenter? → informa o CPF (identificado no IXC) → acesso liberado
         │
         └── Ainda não é cliente?  → nome + telefone → acesso liberado (lead comercial)
         ↓
