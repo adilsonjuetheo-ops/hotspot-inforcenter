@@ -21,7 +21,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve arquivos estáticos do frontend
-app.use(express.static(path.join(__dirname, '../../public')));
+// index:false — public/index.html é só o redirect estático do GitHub Pages;
+// em produção quem serve "/" é a rota explícita abaixo (public/hotspot/index.html)
+app.use(express.static(path.join(__dirname, '../../public'), { index: false }));
 // Assets do portal também na raiz — o portal é servido em "/" e referencia ./css, ./js, ./img
 app.use(express.static(path.join(__dirname, '../../public/hotspot')));
 
