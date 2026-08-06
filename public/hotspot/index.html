@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wi-Fi Grátis — Inforcenter</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <div class="logo-area">
+          <img src="./img/logo.png" alt="Inforcenter" class="brand-logo">
+          <div class="logo-sub">Internet fibra óptica no Vale do Jequitinhonha</div>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <!-- Steps indicator -->
+        <div class="steps">
+          <div class="step-dot active" id="dot1"></div>
+          <div class="step-dot" id="dot2"></div>
+          <div class="step-dot" id="dot3"></div>
+        </div>
+
+        <!-- Alert area -->
+        <div id="alert-area"></div>
+
+        <!-- STEP 1: Escolha de fluxo + dados -->
+        <div id="step-1">
+          <h2 class="card-title" id="page-title">Acesse o Wi-Fi Grátis</h2>
+          <p class="card-subtitle" id="page-subtitle">Conecte-se agora e aproveite a internet mais rápida da região!</p>
+
+          <div class="mode-tabs">
+            <button type="button" class="mode-tab active" id="tab-client" onclick="switchMode('client')">Sou cliente Inforcenter</button>
+            <button type="button" class="mode-tab" id="tab-visitor" onclick="switchMode('visitor')">Ainda não sou cliente</button>
+          </div>
+
+          <!-- Fluxo CLIENTE: CPF + senha do app/hotsite -->
+          <form id="form-client" onsubmit="return false;">
+            <div class="form-group">
+              <label class="form-label">CPF</label>
+              <input type="text" id="input-cpf" class="form-control" placeholder="000.000.000-00" inputmode="numeric" maxlength="14" autocomplete="username">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Senha</label>
+              <input type="password" id="input-senha" class="form-control" placeholder="A mesma senha do app Inforcenter" autocomplete="current-password">
+              <span style="display:block;font-size:12px;color:var(--text-muted);margin-top:6px;">No primeiro acesso, use os 5 primeiros dígitos do seu CPF.</span>
+            </div>
+            <button type="submit" class="btn btn-primary" id="btn-cpf-login" onclick="cpfLogin()">
+              Entrar e conectar
+            </button>
+          </form>
+
+          <!-- Fluxo VISITANTE: nome + telefone, sem SMS -->
+          <form id="form-visitor" class="hidden" onsubmit="return false;">
+            <div class="form-group" id="name-group">
+              <label class="form-label">Seu nome</label>
+              <input type="text" id="input-name" class="form-control" placeholder="Ex: João Silva" autocomplete="name">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Celular (WhatsApp)</label>
+              <div class="phone-wrapper">
+                <span class="phone-prefix">🇧🇷 +55</span>
+                <input type="tel" id="input-phone" placeholder="(38) 99999-9999"
+                  inputmode="numeric" autocomplete="tel" maxlength="15">
+              </div>
+            </div>
+
+            <div class="form-group hidden" id="email-group">
+              <label class="form-label">E-mail (opcional)</label>
+              <input type="email" id="input-email" class="form-control" placeholder="seu@email.com" autocomplete="email">
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="btn-send-otp" onclick="sendOTP()">
+              Conectar ao Wi-Fi Grátis
+            </button>
+          </form>
+        </div>
+
+        <!-- STEP 2: Verificação OTP (visitante, se ativado) -->
+        <div id="step-2" class="hidden">
+          <h2 class="card-title">Confirme seu número</h2>
+          <p class="card-subtitle" id="otp-subtitle">Digite o código de 6 dígitos enviado para <strong id="phone-display"></strong></p>
+
+          <form id="form-otp" onsubmit="return false;">
+            <div class="form-group">
+              <div class="otp-inputs">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input type="text" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="btn-verify" onclick="verifyOTP()">
+              Confirmar e Conectar
+            </button>
+
+            <div class="resend-timer">
+              <span id="resend-text">Reenviar código em <span id="countdown">60</span>s</span>
+              <button class="resend-btn" id="resend-btn" disabled onclick="resendOTP()">Reenviar SMS</button>
+            </div>
+
+            <button class="btn btn-outline" onclick="goBack()">← Voltar</button>
+          </form>
+        </div>
+
+        <!-- STEP 3: Sucesso -->
+        <div id="step-3" class="hidden">
+          <div class="success-icon">✅</div>
+          <h2 class="card-title" id="success-title">Conectado com sucesso!</h2>
+          <p class="card-subtitle" id="success-subtitle">Bem-vindo ao Wi-Fi da Inforcenter. Aproveite a internet!</p>
+
+          <div class="access-info">
+            <span class="time-badge" id="free-time-display">60</span>
+            <span class="time-label">minutos de acesso grátis</span>
+          </div>
+
+          <div id="credentials-area" class="credentials hidden">
+            <h4>Dados de acesso (se solicitado)</h4>
+            <div class="cred-row">
+              <span class="cred-label">Usuário</span>
+              <span class="cred-value" id="cred-user">—</span>
+            </div>
+            <div class="cred-row">
+              <span class="cred-label">Senha</span>
+              <span class="cred-value" id="cred-pass">—</span>
+            </div>
+          </div>
+
+          <a href="https://inforcenterfibra.com.br" id="btn-visit" class="btn btn-primary" style="margin-top:20px;">
+            🌐 Visitar site da Inforcenter
+          </a>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <p class="footer-text">
+          Ao se conectar, você concorda com nossos <a href="#" onclick="openTerms(); return false;">Termos de Uso e Privacidade</a>.<br>
+          Inforcenter &bull; Vale do Jequitinhonha, MG &bull; WhatsApp (33) 98813-4583
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Termos de Uso e Privacidade -->
+  <div id="terms-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeTerms()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Termos de Uso e Privacidade</h3>
+        <button class="modal-close" onclick="closeTerms()" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>1. O serviço.</strong> O Wi-Fi gratuito é oferecido pela <strong>Inforcenter</strong> como cortesia, sem garantia de velocidade, estabilidade ou disponibilidade contínua. O acesso é liberado por tempo limitado e pode ser encerrado ou alterado a qualquer momento.</p>
+        <p><strong>2. Clientes Inforcenter.</strong> Se você já é cliente, o acesso é liberado com o mesmo login (CPF e senha) do app Inforcenter — não coletamos uma senha nova, apenas confirmamos sua identidade junto ao nosso sistema.</p>
+        <p><strong>3. Visitantes.</strong> Para quem ainda não é cliente, coletamos: nome, número de celular, e-mail (quando informado), endereço MAC do aparelho, endereço IP e horários de conexão.</p>
+        <p><strong>4. Finalidade (LGPD).</strong> Esses dados são usados para: (a) identificar o usuário e liberar o acesso à rede; (b) segurança e registro das conexões, conforme o Marco Civil da Internet (Lei 12.965/2014); e (c) <strong>contato comercial da Inforcenter</strong>, por WhatsApp ou telefone, com ofertas de planos de internet. Ao se conectar, você autoriza esse contato.</p>
+        <p><strong>5. Compartilhamento.</strong> Seus dados não são vendidos nem compartilhados com terceiros, exceto por obrigação legal ou ordem judicial.</p>
+        <p><strong>6. Guarda e exclusão.</strong> Os registros de conexão são guardados pelo prazo legal mínimo. Você pode solicitar a exclusão dos seus dados de contato a qualquer momento pelo WhatsApp <strong>(33) 98813-4583</strong>.</p>
+        <p><strong>7. Seus direitos.</strong> Nos termos da Lei Geral de Proteção de Dados (Lei 13.709/2018), você pode solicitar acesso, correção ou exclusão dos seus dados, ou revogar o consentimento de contato comercial, pelo mesmo canal acima.</p>
+        <p><strong>8. Uso responsável.</strong> É proibido usar a rede para atividades ilegais, acesso a conteúdo ilícito ou tentativas de invasão. O usuário é responsável pelo uso que fizer da conexão.</p>
+        <p class="terms-updated">Inforcenter — Vale do Jequitinhonha/MG • Última atualização: agosto de 2026</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="closeTerms()">Entendi</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/main.js"></script>
+</body>
+</html>
