@@ -20,6 +20,17 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Domínio adminhotspot.* cai direto no painel (mesmo app, dois domínios no Coolify);
+// qualquer outro domínio (hotspot.*) é o portal normal.
+const isAdminHost = (req) => (req.hostname || '').toLowerCase().startsWith('adminhotspot');
+
+// No domínio admin, os assets (./css, ./js, ./img) do painel precisam resolver
+// na raiz — senão o admin/index.html procuraria em /css, /js, /img (que são do portal).
+app.use((req, res, next) => {
+  if (!isAdminHost(req)) return next();
+  express.static(path.join(__dirname, '../../public/admin'))(req, res, next);
+});
+
 // Serve arquivos estáticos do frontend
 // index:false — public/index.html é só o redirect estático do GitHub Pages;
 // em produção quem serve "/" é a rota explícita abaixo (public/hotspot/index.html)
@@ -32,8 +43,11 @@ app.use('/api/hotspot', hotspotRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/auth', authRoutes);
 
-// Rota principal — portal hotspot
+// Rota principal — portal hotspot (ou painel admin, no domínio adminhotspot.*)
 app.get('/', (req, res) => {
+  if (isAdminHost(req)) {
+    return res.sendFile(path.join(__dirname, '../../public/admin/index.html'));
+  }
   res.sendFile(path.join(__dirname, '../../public/hotspot/index.html'));
 });
 
