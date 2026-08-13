@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Domínio adminhotspot.* cai direto no painel (mesmo app, dois domínios no Coolify);
 // qualquer outro domínio (hotspot.*) é o portal normal.
-const isAdminHost = (req) => (req.hostname || '').toLowerCase().startsWith('adminhotspot');
+const isAdminHost = (req) => (req.hostname || '').toLowerCase().split('.').includes('adminhotspot');
 
 // No domínio admin, os assets (./css, ./js, ./img) do painel precisam resolver
 // na raiz — senão o admin/index.html procuraria em /css, /js, /img (que são do portal).
